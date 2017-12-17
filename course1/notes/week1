@@ -1,0 +1,12 @@
+Supervised learning
+. structured vs unstructured data -- ie, databases vs images/audio/text
+. NNs good at both, but latter particularly significant
+. deep learning effectiveness taken off b/c increase of data availability -- require more data
+  to be effective, but with large quantities of _labeled_ data, more effective than traditional methods
+  like regression
+. m -- size of training set
+. switch from sigmoid functions to relu functions
+  -- sigmoid functions disadvantageous b/c at ends slope is close to 0, which slows learning
+  -- with relu, gradient descent works much faster
+
+

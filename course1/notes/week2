@@ -1,0 +1,15 @@
+Notation
+. n_x -- input size of x
+. X matrix -- each individual test case is a column
+ -- shape (n_x, m)
+. Y matrix -- also columnar
+ -- shape (1, m)
+Logistic Regression
+. y_hat = sigmoid( W*x + b )
+  -- W is n_x dimensional vector
+  -- b is real number
+. sigmoid = 1 / (1 + e^-z)
+. think of z as the x axis on a sigmoid graph -- large z makes denom small -> close to 1
+  -- small z make denom large -- close to 0
+  -- goal is for params W and b to lead to accurate values of sigmoid function given inputs
+
