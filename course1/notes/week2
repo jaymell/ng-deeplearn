@@ -4,6 +4,7 @@ Notation
  -- shape (n_x, m)
 . Y matrix -- also columnar
  -- shape (1, m)
+
 Logistic Regression
 . y_hat = sigmoid( W*x + b )
   -- W is n_x dimensional vector
@@ -12,4 +13,28 @@ Logistic Regression
 . think of z as the x axis on a sigmoid graph -- large z makes denom small -> close to 1
   -- small z make denom large -- close to 0
   -- goal is for params W and b to lead to accurate values of sigmoid function given inputs
+
+. Loss function
+ -- squared error not sufficient with logistic regression (e.g., 1/2(y_hat - y)^2)
+ -- instead:
+  L(y_hat, y) = -(ylog y_hat + (1 -y) log(1-y_hat))
+ -- if y_hat is 1, y will ideally be large as well ( - log y_hat )
+ -- if y_hat is 0, y will ideally be small ( - log (1 - y_hat ))
+
+. Cost function
+ -- summation of loss function across entire data set
+ -- J (w,b) = -1/m Sigma[ y^i log y_hat^i + (1 -y^i) log (1 - y_hat^i ) ]
+
+. Gradient Descent
+ -- updates values of w and b based on derivative
+ -- w := w - alpha * d J(w, b) / dw
+  -- aka w - alpha * "dw"
+ -- b := b - alpha * d J(w, b) / db
+
+. Derivatives 
+ -- effectively, the slope of a function / rate of change of a function at a particular point
+
+
+
+
 
