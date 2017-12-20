@@ -37,4 +37,33 @@ Derivatives
  -- f(x) = x^3 ... d/dx f(x) = 3x^2
  -- f(x) = log x ... d/dx f(x) = 1/x
 
+Chain Rule of Calculus
 
+ u=bc -> 
+  v = a + u ->
+    J = 3v
+
+dJ/dv = 3 -- J increase by 3x whatever v increases by
+dV/da = 1
+
+. chain rule says that impact of a on J will be product of 
+  a's impact on v and v's impact on J
+
+  == 3 * 1
+  == 3
+
+Notation: 
+  a == y_hat
+  z == result of your function prior to sigmoid 
+   -- e.g., with 2 variables x1 and x2, z = w1x1 + wx2x + b
+  a = sigma(z)
+  L = loss(a, y)
+.... shortcut: dz (derivative of L with respect to z) = a - y
+  for single training example:
+    dw1 = w1*dz
+    dw2 = w2*dz
+    db = dz
+
+
+
+  
