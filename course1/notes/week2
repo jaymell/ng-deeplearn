@@ -53,17 +53,36 @@ dV/da = 1
   == 3
 
 Notation: 
-  a == y_hat
+  a (activation) == y_hat
   z == result of your function prior to sigmoid 
    -- e.g., with 2 variables x1 and x2, z = w1x1 + wx2x + b
   a = sigma(z)
   L = loss(a, y)
-.... shortcut: dz (derivative of L with respect to z) = a - y
+.... *** shortcut: dz (derivative of L with respect to z) = a - y ***
   for single training example:
     dw1 = w1*dz
     dw2 = w2*dz
     db = dz
 
+Vectorizing LR
+. Think of vectorized x as row vector of all individual values of z per training set
+. [ z1, z2, ... zm ] == w' X + [b, b ... b ] -> b's are row vector of individual biases
+ X = n * m vector -- n is number of x variables in a single example, m is number of training examples
+ w = row vector of weights -- [w1, w2 ... wn ]
+ A = row vector of individual a values
+ Z = row vector of individual z values
+ Y = row vector of individual y values
+. in python:
+  Z = np.dot(W.T, x) + b
+  -- python will automatically turn b into a row vector -- 'broadcasting'
 
+. gradient descent:
+ dz1 = a1-y1 , dz2 = a2-y2, etc...
+ dZ = [ dz1, dz2 ... dzm ]
+ dZ = A - Y
+ db = 1/m * Sigma(dZ) -- in python, np.sum(dZ) * 1/m
+ dw = 1/m X*dZ'
 
-  
+Broadcasting -- python will auto-copy real numbers and small matrices to appropriate dimensions for doing
+  matrix arithmetic
+
