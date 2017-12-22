@@ -1,0 +1,28 @@
+Neural Networks
+
+Notation
+. a^[0] = x -- [0] corresponds to layers -- x is effectively layer 0
+  -- in 2-layer network, x = 0, hidden layer = 1 (a^[1]), output layer = a^[2] == yhat
+  -- if hidden layer had 4 nodes, these would be a^[1]_1, a^[1]_2 ... a^[1]_4
+  -- w^[1] would be w matrix for hidden layer -- 4x3 matrix -> 4 nodes in layer, 3 input units
+  -- b^[1] would be 4x1 matrix -> corresponding to 4 nodes of layer
+
+. continuing the above example:
+ -- z^[1]_1 = w^[1]_1'x + b^[1]_1 -> a^[1]_1 = sigmoid(z^[1]_1)
+   -- w in this case is row vector 1x3 after being transposed
+   -- x would be row vector 1x3 of weights from each x of previous layer
+   -- b a single real number
+    ... for each of 4 nodes of 1st layer
+ -- this can be condensed into single matrix operation:
+   Z^[1] = W^[1]'x + b^[1]
+   -- x is still just a column vector b/c its values don't change, only their weights
+      as applied to each node of next layer
+-- a^[1] = sigmoid(z^[1]), a^[1] = 4x1 matrix, z^[1] = 4x1
+-- output layer:
+  z^[2] = W^[2]a^[1] + b^[2],
+  -- z^[2] is 1x1, W^[2] is 1x4, a^[1] is 4x1, b^[2] is 1x1
+  -- a^[2] = simoid(z^[2]), 1x1
+
+
+
+

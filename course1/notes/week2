@@ -83,6 +83,9 @@ Vectorizing LR
  db = 1/m * Sigma(dZ) -- in python, np.sum(dZ) * 1/m
  dw = 1/m X*dZ'
 
+. updating parameters:
+ w := w - alpha * dw
+
 Broadcasting -- python will auto-copy real numbers and small matrices to appropriate dimensions for doing
   matrix arithmetic
 
