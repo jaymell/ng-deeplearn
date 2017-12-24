@@ -6,6 +6,7 @@ Notation
   -- if hidden layer had 4 nodes, these would be a^[1]_1, a^[1]_2 ... a^[1]_4
   -- w^[1] would be w matrix for hidden layer -- 4x3 matrix -> 4 nodes in layer, 3 input units
   -- b^[1] would be 4x1 matrix -> corresponding to 4 nodes of layer
+. g^[l] = particular activation function used at layer l -- e.g., sigmoid, tanh
 
 . continuing the above example:
  -- z^[1]_1 = w^[1]_1'x + b^[1]_1 -> a^[1]_1 = sigmoid(z^[1]_1)
@@ -46,4 +47,36 @@ Activation Functions
 . linear activation functions generally never used, except in very specific circumstances,
   like output layer of example where output is a real number
 
+Gradient Descent
+. for 2-layer NN
+. J(W^[1], b^[1], W^[2], b^[2]) = 1/m Sigma L(a^[2], y)
+1) Random initialization of parameters
+2) Compute a^[2]_i for (i=1, ... m)
+   Computer dJ/dW^[1] aka dW^[1], db^[1], dW^[2], db^[2]
+   Update parameters:
+     W^[1] = W^[1] - alpha * dW^[1]
+     ... etc.
 
+. Forward propagation
+  Z^[1] = W^[1]X + b^[1]
+  A^[1] = g^[1](Z^[1])
+  ... etc
+
+. Vectorized Backward Propagation
+  dZ^[2] = A^[2] - Y
+  dW^[2] = 1/m (dZ^[2]A^[1]') -- A^[1] is transposed
+  db^[2] = 1/m np.sum(dZ^[2], axis=1, keepdims=True)  -> n^[2] X 1 matrix
+  dZ^[1] = W^[2] * dZ^[2] * g^[1]'(Z^[1])
+                  |              | 
+           n^[1] X m matrix      |
+                               n^[1] X m matrix 
+  dW^[1] = 1/m(dZ^[1]X') -- X is transposed
+  db^[1] = 1/m (np.sum(dZ^[1], axis=1, keepdims=True) -> n^[1] X 1 matrix
+
+. Parameter initialization
+ -- for NNs, must be randomly initialized
+ -- actually, initializing biases to 0 is ok, but not W
+ -- if initialized to 0, all units in layers will be identical forever
+ -- W^[1] = np.random.rand((dimension)) * 0.01
+   -- small value (0.01) is chosen to avoid large z values, and thus, slow learning
+ -- b^[1] = np.zero((dimension))
