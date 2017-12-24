@@ -23,6 +23,27 @@ Notation
   -- z^[2] is 1x1, W^[2] is 1x4, a^[1] is 4x1, b^[2] is 1x1
   -- a^[2] = simoid(z^[2]), 1x1
 
+Vectorizing Across Multiple Training Examples
+. Z = WX + b, A = sigmoid(Z)
+ -- Z becomes [# of input units]Xm matrix with individual vectors stacked in columns
+ -- X becomes nXm matrix of training examples stacked in columns
+ -- A becomes [# of hidden units]Xm matrix with individual values stacked in columns 
 
+Activation Functions
+. ie, sigmoid function -- a = 1/(1+e^-z)
+. tanh -- (e^z - e^-z) / (e^z + e^-z)
+ -- centers data around 0
+ -- a and z range between -1 and 1
+ -- not appropriate for binary classification, though b/c of -1 to 1
+. activations can be different at different layers, so sigmoid for output layer, others for other layers
+. downside to both tanh and sigmoid:
+  -- if z is very large or small, slope is very small, so training will take a long time
+. relu -- rectified linear unit:
+ -- a = max(0, z)
+ -- increasingly becoming the default
+ --  leaky relu is an alternative, derivative won't be 0 if z is negative
+   max(0.01, z)
+. linear activation functions generally never used, except in very specific circumstances,
+  like output layer of example where output is a real number
 
 
