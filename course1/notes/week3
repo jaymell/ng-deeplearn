@@ -28,7 +28,7 @@ Vectorizing Across Multiple Training Examples
 . Z = WX + b, A = sigmoid(Z)
  -- Z becomes [# of input units]Xm matrix with individual vectors stacked in columns
  -- X becomes nXm matrix of training examples stacked in columns
- -- A becomes [# of hidden units]Xm matrix with individual values stacked in columns 
+ -- A becomes [# of hidden units]Xm matrix with individual values stacked in columns
 
 Activation Functions
 . ie, sigmoid function -- a = 1/(1+e^-z)
@@ -66,10 +66,10 @@ Gradient Descent
   dZ^[2] = A^[2] - Y
   dW^[2] = 1/m (dZ^[2]A^[1]') -- A^[1] is transposed
   db^[2] = 1/m np.sum(dZ^[2], axis=1, keepdims=True)  -> n^[2] X 1 matrix
-  dZ^[1] = W^[2] * dZ^[2] * g^[1]'(Z^[1])
-                  |              | 
+  dZ^[1] = W^[2]' * dZ^[2] * g^[1]'(Z^[1])
+                  |              |
            n^[1] X m matrix      |
-                               n^[1] X m matrix 
+                               n^[1] X m matrix
   dW^[1] = 1/m(dZ^[1]X') -- X is transposed
   db^[1] = 1/m (np.sum(dZ^[1], axis=1, keepdims=True) -> n^[1] X 1 matrix
 
@@ -80,3 +80,9 @@ Gradient Descent
  -- W^[1] = np.random.rand((dimension)) * 0.01
    -- small value (0.01) is chosen to avoid large z values, and thus, slow learning
  -- b^[1] = np.zero((dimension))
+
+
+# matrix multiplication in numpy:
+a = np.array([[1,2],[1,2],[1,2],[1,2]])
+b = np.array([1,2])
+c = np.dot(a,b)

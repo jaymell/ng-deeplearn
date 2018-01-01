@@ -240,7 +240,7 @@ print("The size of the output layer is: n_y = " + str(n_y))
 # - You will initialize the bias vectors as zeros. 
 #     - Use: `np.zeros((a,b))` to initialize a matrix of shape (a,b) with zeros.
 
-# In[11]:
+# In[9]:
 
 # GRADED FUNCTION: initialize_parameters
 
@@ -281,7 +281,7 @@ def initialize_parameters(n_x, n_h, n_y):
     return parameters
 
 
-# In[12]:
+# In[10]:
 
 n_x, n_h, n_y = initialize_parameters_test_case()
 
@@ -339,7 +339,7 @@ print("b2 = " + str(parameters["b2"]))
 #     2. Implement Forward Propagation. Compute $Z^{[1]}, A^{[1]}, Z^{[2]}$ and $A^{[2]}$ (the vector of all your predictions on all the examples in the training set).
 # - Values needed in the backpropagation are stored in "`cache`". The `cache` will be given as an input to the backpropagation function.
 
-# In[ ]:
+# In[27]:
 
 # GRADED FUNCTION: forward_propagation
 
@@ -355,18 +355,18 @@ def forward_propagation(X, parameters):
     """
     # Retrieve each parameter from the dictionary "parameters"
     ### START CODE HERE ### (≈ 4 lines of code)
-    W1 = None
-    b1 = None
-    W2 = None
-    b2 = None
+    W1 = parameters["W1"]
+    b1 = parameters["b1"]
+    W2 = parameters["W2"]
+    b2 = parameters["b2"]
     ### END CODE HERE ###
     
     # Implement Forward Propagation to calculate A2 (probabilities)
     ### START CODE HERE ### (≈ 4 lines of code)
-    Z1 = None
-    A1 = None
-    Z2 = None
-    A2 = None
+    Z1 = np.dot(W1,X) + b1
+    A1 = np.tanh(Z1) 
+    Z2 = np.dot(W2,A1) + b2
+    A2 = sigmoid(Z2) 
     ### END CODE HERE ###
     
     assert(A2.shape == (1, X.shape[1]))
@@ -379,7 +379,7 @@ def forward_propagation(X, parameters):
     return A2, cache
 
 
-# In[ ]:
+# In[28]:
 
 X_assess, parameters = forward_propagation_test_case()
 A2, cache = forward_propagation(X_assess, parameters)
@@ -412,7 +412,7 @@ print(np.mean(cache['Z1']) ,np.mean(cache['A1']),np.mean(cache['Z2']),np.mean(ca
 # (you can use either `np.multiply()` and then `np.sum()` or directly `np.dot()`).
 # 
 
-# In[ ]:
+# In[37]:
 
 # GRADED FUNCTION: compute_cost
 
@@ -433,8 +433,8 @@ def compute_cost(A2, Y, parameters):
 
     # Compute the cross-entropy cost
     ### START CODE HERE ### (≈ 2 lines of code)
-    logprobs = None
-    cost = None
+    logprobs = np.multiply(np.log(A2),Y) + np.multiply((1-Y),np.log(1-A2))
+    cost = -1.0/m * np.sum(logprobs)
     ### END CODE HERE ###
     
     cost = np.squeeze(cost)     # makes sure cost is the dimension we expect. 
@@ -444,7 +444,7 @@ def compute_cost(A2, Y, parameters):
     return cost
 
 
-# In[ ]:
+# In[38]:
 
 A2, Y_assess, parameters = compute_cost_test_case()
 
@@ -495,7 +495,7 @@ print("cost = " + str(compute_cost(A2, Y_assess, parameters)))
 #     - To compute dZ1 you'll need to compute $g^{[1]'}(Z^{[1]})$. Since $g^{[1]}(.)$ is the tanh activation function, if $a = g^{[1]}(z)$ then $g^{[1]'}(z) = 1-a^2$. So you can compute 
 #     $g^{[1]'}(Z^{[1]})$ using `(1 - np.power(A1, 2))`.
 
-# In[ ]:
+# In[49]:
 
 # GRADED FUNCTION: backward_propagation
 
@@ -516,24 +516,24 @@ def backward_propagation(parameters, cache, X, Y):
     
     # First, retrieve W1 and W2 from the dictionary "parameters".
     ### START CODE HERE ### (≈ 2 lines of code)
-    W1 = None
-    W2 = None
+    W1 = parameters["W1"]
+    W2 = parameters["W2"]
     ### END CODE HERE ###
         
     # Retrieve also A1 and A2 from dictionary "cache".
     ### START CODE HERE ### (≈ 2 lines of code)
-    A1 = None
-    A2 = None
+    A1 = cache["A1"]
+    A2 = cache["A2"]
     ### END CODE HERE ###
     
     # Backward propagation: calculate dW1, db1, dW2, db2. 
     ### START CODE HERE ### (≈ 6 lines of code, corresponding to 6 equations on slide above)
-    dZ2 = None
-    dW2 = None
-    db2 = None
-    dZ1 = None
-    dW1 = None
-    db1 = None
+    dZ2 = A2 - Y
+    dW2 = 1.0/m * np.dot(dZ2,A1.T)
+    db2 = 1.0/m * np.sum(dZ2, axis=1, keepdims=True)
+    dZ1 = np.dot(W2.T,dZ2) * (1 - np.power(A1, 2))
+    dW1 = 1.0/m * np.dot(dZ1,X.T)
+    db1 = 1.0/m * np.sum(dZ1, axis=1, keepdims=True)
     ### END CODE HERE ###
     
     grads = {"dW1": dW1,
@@ -544,7 +544,7 @@ def backward_propagation(parameters, cache, X, Y):
     return grads
 
 
-# In[ ]:
+# In[50]:
 
 parameters, cache, X_assess, Y_assess = backward_propagation_test_case()
 
@@ -599,7 +599,7 @@ print ("db2 = "+ str(grads["db2"]))
 # 
 # 
 
-# In[ ]:
+# In[51]:
 
 # GRADED FUNCTION: update_parameters
 
@@ -616,26 +616,26 @@ def update_parameters(parameters, grads, learning_rate = 1.2):
     """
     # Retrieve each parameter from the dictionary "parameters"
     ### START CODE HERE ### (≈ 4 lines of code)
-    W1 = None
-    b1 = None
-    W2 = None
-    b2 = None
+    W1 = parameters["W1"]
+    b1 = parameters["b1"]
+    W2 = parameters["W2"]
+    b2 = parameters["b2"]
     ### END CODE HERE ###
     
     # Retrieve each gradient from the dictionary "grads"
     ### START CODE HERE ### (≈ 4 lines of code)
-    dW1 = None
-    db1 = None
-    dW2 = None
-    db2 = None
+    dW1 = grads["dW1"]
+    db1 = grads["db1"]
+    dW2 = grads["dW2"]
+    db2 = grads["db2"]
     ## END CODE HERE ###
     
     # Update rule for each parameter
     ### START CODE HERE ### (≈ 4 lines of code)
-    W1 = None
-    b1 = None
-    W2 = None
-    b2 = None
+    W1 = W1 - dW1 * learning_rate
+    b1 = b1 - db1 * learning_rate
+    W2 = W2 - dW2 * learning_rate
+    b2 = b2 - db2 * learning_rate
     ### END CODE HERE ###
     
     parameters = {"W1": W1,
@@ -646,7 +646,7 @@ def update_parameters(parameters, grads, learning_rate = 1.2):
     return parameters
 
 
-# In[ ]:
+# In[52]:
 
 parameters, grads = update_parameters_test_case()
 parameters = update_parameters(parameters, grads)
@@ -696,7 +696,7 @@ print("b2 = " + str(parameters["b2"]))
 # 
 # **Instructions**: The neural network model has to use the previous functions in the right order.
 
-# In[ ]:
+# In[53]:
 
 # GRADED FUNCTION: nn_model
 
@@ -719,11 +719,11 @@ def nn_model(X, Y, n_h, num_iterations = 10000, print_cost=False):
     
     # Initialize parameters, then retrieve W1, b1, W2, b2. Inputs: "n_x, n_h, n_y". Outputs = "W1, b1, W2, b2, parameters".
     ### START CODE HERE ### (≈ 5 lines of code)
-    parameters = None
-    W1 = None
-    b1 = None
-    W2 = None
-    b2 = None
+    parameters = initialize_parameters(X.shape[0], n_h, Y.shape[0])
+    W1 = parameters["W1"]
+    b1 = parameters["b1"]
+    W2 = parameters["W2"]
+    b2 = parameters["b2"]
     ### END CODE HERE ###
     
     # Loop (gradient descent)
@@ -732,16 +732,16 @@ def nn_model(X, Y, n_h, num_iterations = 10000, print_cost=False):
          
         ### START CODE HERE ### (≈ 4 lines of code)
         # Forward propagation. Inputs: "X, parameters". Outputs: "A2, cache".
-        A2, cache = None
+        A2, cache = forward_propagation(X, parameters)
         
         # Cost function. Inputs: "A2, Y, parameters". Outputs: "cost".
-        cost = None
+        cost = compute_cost(A2, Y, parameters)
  
         # Backpropagation. Inputs: "parameters, cache, X, Y". Outputs: "grads".
-        grads = None
+        grads = backward_propagation(parameters, cache, X, Y)
  
         # Gradient descent parameter update. Inputs: "parameters, grads". Outputs: "parameters".
-        parameters = None
+        parameters = update_parameters(parameters, grads)
         
         ### END CODE HERE ###
         
@@ -752,7 +752,7 @@ def nn_model(X, Y, n_h, num_iterations = 10000, print_cost=False):
     return parameters
 
 
-# In[ ]:
+# In[54]:
 
 X_assess, Y_assess = nn_model_test_case()
 parameters = nn_model(X_assess, Y_assess, 4, num_iterations=10000, print_cost=True)
@@ -825,7 +825,7 @@ print("b2 = " + str(parameters["b2"]))
 #     
 # As an example, if you would like to set the entries of a matrix X to 0 and 1 based on a threshold you would do: ```X_new = (X > threshold)```
 
-# In[ ]:
+# In[61]:
 
 # GRADED FUNCTION: predict
 
@@ -843,14 +843,14 @@ def predict(parameters, X):
     
     # Computes probabilities using forward propagation, and classifies to 0/1 using 0.5 as the threshold.
     ### START CODE HERE ### (≈ 2 lines of code)
-    A2, cache = None
-    predictions = None
+    A2, cache = forward_propagation(X, parameters)
+    predictions = A2 > .5 
     ### END CODE HERE ###
     
     return predictions
 
 
-# In[ ]:
+# In[62]:
 
 parameters, X_assess = predict_test_case()
 
@@ -871,7 +871,7 @@ print("predictions mean = " + str(np.mean(predictions)))
 
 # It is time to run the model and see how it performs on a planar dataset. Run the following code to test your model with a single hidden layer of $n_h$ hidden units.
 
-# In[ ]:
+# In[63]:
 
 # Build a model with a n_h-dimensional hidden layer
 parameters = nn_model(X, Y, n_h = 4, num_iterations = 10000, print_cost=True)
@@ -892,7 +892,7 @@ plt.title("Decision Boundary for hidden layer size " + str(4))
 # </table>
 # 
 
-# In[ ]:
+# In[64]:
 
 # Print accuracy
 predictions = predict(parameters, X)
@@ -916,7 +916,7 @@ print ('Accuracy: %d' % float((np.dot(Y,predictions.T) + np.dot(1-Y,1-prediction
 # 
 # Run the following code. It may take 1-2 minutes. You will observe different behaviors of the model for various hidden layer sizes.
 
-# In[ ]:
+# In[65]:
 
 # This may take about 2 minutes to run
 
@@ -959,7 +959,7 @@ for i, n_h in enumerate(hidden_layer_sizes):
 
 # If you want, you can rerun the whole notebook (minus the dataset part) for each of the following datasets.
 
-# In[ ]:
+# In[67]:
 
 # Datasets
 noisy_circles, noisy_moons, blobs, gaussian_quantiles, no_structure = load_extra_datasets()
@@ -982,6 +982,13 @@ if dataset == "blobs":
 
 # Visualize the data
 plt.scatter(X[0, :], X[1, :], c=Y, s=40, cmap=plt.cm.Spectral);
+
+# run on different datasets:
+parameters = nn_model(X, Y, n_h = 4, num_iterations = 10000, print_cost=True)
+plot_decision_boundary(lambda x: predict(parameters, x.T), X, Y)
+predictions = predict(parameters, X)
+print ('Accuracy: %d' % float((np.dot(Y,predictions.T) + np.dot(1-Y,1-predictions.T))/float(Y.size)*100) + '%')
+plt.title("Decision Boundary for hidden layer size " + str(4))
 
 
 # Congrats on finishing this Programming Assignment!
