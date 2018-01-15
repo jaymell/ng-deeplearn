@@ -1,0 +1,141 @@
+Train / Dev ("Holdout cross-validation") / Test sets
+. Dev -- testing performance of multiple models
+. Test -- test best-performing model
+ -- goal is for it to provide unbiased estimate of performance; if
+    you don't need this, test set may not be needed
+. Ratios
+ -- traditionally, ~ 60/20/20
+ -- with big data sets, eg 1 million samples: ~ 98/1/1, 99.5/.25/.25
+
+. Important to ensure that your different sets are drawn from __same__ distributions
+ -- don't use high-quality images for training, then low-quality for other sets
+
+
+Bias vs Variance
+. Bias: model underfits data -- ie, model is highly linear, but data suggest a nonlinear pattern
+. Variance: model overfits data
+. Previously, talk of a bias/variance tradeoff -- this is less relevant today w/ availability
+  of more data and larger networks
+
+Example:
+ Train set error: 1%
+ Dev set error: 11%
+ -- High variance
+
+Example:
+ Train set error: 15%
+ Dev set error: 16%
+ -- If your initial estimate would be 0% (say you're detecting cat images, something you would expect a good model to be able
+    to do with very high accuracy -- Bayes error), this would be:
+ -- High Bias
+ -- But if you're trying to predict something more uncertain, this may actually be a good model
+
+Example:
+ Train set error: 15%
+ Dev set error: 30%
+ -- High Bias and High Variance
+
+
+Basic "recipe" for ML
+. Train model
+ -- if High Bias (training set performance):
+   -- Bigger network
+   -- Train longer
+   -- better NN architecture
+ -- if High Variance (dev set performance):
+   -- More data
+   -- Regularization
+   -- better NN architecture
+
+
+Regularization
+. High variance problems -- overfitting
+
+Logistic Regression regularization:
+. Regularization is added to the cost function:
+  -- ( lambda / 2m ) * ||w||^2_2
+  -- lambda aka regularization parameter
+  -- ||w||^2_2 == norm of w squared
+    ==  Sigma_j..n_x(w_j^2) = np.dot(W.T, W)
+  -- aka l2 regularization
+. You can also technically add regularization parameter for b,
+  but since b is a single number, it's not significant
+. L1 regularization -- not used as often, results in more zeros in model which can reduce size in memory
+ -- lambda/m * ||w||_1
+
+NN regularization:
+J(W^[1], b^[1] ... W^[L],b^[L]) = 1/m * Sigma_i..n(L(yhat^i, y^i)) + lambda/2m Sigma_l..L(||W^[l]||^2_F)
+"F" instead of 2 b/c L2 regularization is called "Frobenius norm" in neural networks
+
+. In backprop, this becomes:
+dW^[l] = (...from backprop) + lambda/m*W[l]
+
+. you make your weights smaller, aka weight decay
+
+
+Why does regularization reduce overfitting?
+. Large lambda sets weights close to 0, which reduces impact of individual weights
+  and makes network 'simpler', more linear
+. If you think of tanh or sigmoid graph, smaller w reduces size of z, which makes graph more linear
+ -- higher values of z are what make function non-linear
+
+
+Dropout Regularization
+. randomly removing particular weights on each iteration of gradient descent
+
+if l = 3
+keep_prob = , say .8
+
+d3 = np.random.rand(a3.shape[0], a3.shape[1]) < keep_prob
+a3 = np.multiply(a3,d3)
+a3 /= keep_prob # this cancels out the reduction in expected value of a3 by zeroing out certain weights
+
+. at test time, no drop out
+. keep_prob can vary by layer, ie, set keep_prob lower for larger layers where more worried about overfitting
+. dropout used heavily in computer vision, where there are tons of inputs and never enough data
+. dropout will effect J with each iteration of gradient descent, so harder to tell when plotting
+  whether gradient descent working properly
+   -- do gradient descent without first, then add dropout
+
+
+Other Regularization methods
+. Data augmentation -- ie, flipping images on axis horizontally
+  -- can easily double your dataset like this
+. Early stopping
+ -- plot _BOTH_ dev set and training set error as function of # iterations gradient descent
+ -- you should see trainining set curve monotonically decreasing
+ -- but dev set should start to level off or increase
+ -- so, stop gradient descent at number of iterations that dev set starts to go off track
+. Downsides of early stopping:
+  -- if goal of ML is both:
+  1) optimize cost function
+    -- gradient descent, (and other tools)...
+  2) reduce overfitting
+    -- regularization
+  -- downside is, you're effectively blurring these separate goals with early stopping, b/c
+     you're coupling both of them together
+  -- therefore, l2 regularization often preferable
+
+
+Normalization
+. set mean to zero (subtract mean from each sample)
+ -- mu = 1/m Sigma(x^i)
+ -- x := x - mu
+. normalize variance
+ -- sigma^2 = 1/m Sigma((x^i)^2)
+ -- x := x/sigma^2
+. normalization will make your cost gradient more spherical -- otherwise, could potentially be flattened
+  and take lots of iterations to optimize if your different inputs are on dramatically different ranges
+
+
+Vanishing / Exploding Gradients
+. derivatives likely to get exponentially large or small in deep networks
+. can cause gradient descent to take a very long time
+. careful weight initialization can ameliorate this
+
+
+Weight Initialization for Deep Networks to Avoid Vanishing/Exploding Gradients
+. the larger n is (number of features), the smaller w should be
+. basically, you want to set variance of w^[l] to be proportional to n^[l-1]
+ -- Var(W) = 1/n for tanh, 2/n for relu
+ -- in practice: W^[l] = np.random.randn(...) * np.sqrt(2/n^[l-1]) -- the '2' is for relu specifically
