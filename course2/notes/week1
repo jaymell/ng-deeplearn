@@ -139,3 +139,18 @@ Weight Initialization for Deep Networks to Avoid Vanishing/Exploding Gradients
 . basically, you want to set variance of w^[l] to be proportional to n^[l-1]
  -- Var(W) = 1/n for tanh, 2/n for relu
  -- in practice: W^[l] = np.random.randn(...) * np.sqrt(2/n^[l-1]) -- the '2' is for relu specifically
+
+Gradient checking
+. only use for debugging
+. Take all your parameters W^[1], b^[1] ... W^[L], b^[L], and put them in vector theta
+. Take all your derivative parameters ... dW^[L], db^[L], and put them in vector dtheta
+. for each element in theta, compute: 
+  dtheta_approx^[i] = ( J(theta_1, ... theta_i + e ... ) - J(theta_1, ... theta_i - e ... ) ) / 2e
+. dtheta_approx^[i] should be approximately equal to dtheta[i]
+ -- compute euclidean distance between the two (l2 norm -- sum of squares of differences, then take square root) / divide by euclidean distance of each of them added together to get a ratio
+ -- should be around 10^-7 ; if bigger than 10^-5, you fucked up
+ -- look at specific d_thetaapprox i differences and try to isolate problem
+. must include regularization term if you've used it in your cost function
+. doesn't work with dropout
+. may be worth using grad check after random initializiation, then again after some training
+ -- it's possible that algorithm is correct when weights close to zero but not after training
