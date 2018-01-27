@@ -90,7 +90,7 @@ d3 = np.random.rand(a3.shape[0], a3.shape[1]) < keep_prob
 a3 = np.multiply(a3,d3)
 a3 /= keep_prob # this cancels out the reduction in expected value of a3 by zeroing out certain weights
 
-. at test time, no drop out
+. at test time, don't use drop out -- only use during training
 . keep_prob can vary by layer, ie, set keep_prob lower for larger layers where more worried about overfitting
 . dropout used heavily in computer vision, where there are tons of inputs and never enough data
 . dropout will effect J with each iteration of gradient descent, so harder to tell when plotting
@@ -144,7 +144,7 @@ Gradient checking
 . only use for debugging
 . Take all your parameters W^[1], b^[1] ... W^[L], b^[L], and put them in vector theta
 . Take all your derivative parameters ... dW^[L], db^[L], and put them in vector dtheta
-. for each element in theta, compute: 
+. for each element in theta, compute:
   dtheta_approx^[i] = ( J(theta_1, ... theta_i + e ... ) - J(theta_1, ... theta_i - e ... ) ) / 2e
 . dtheta_approx^[i] should be approximately equal to dtheta[i]
  -- compute euclidean distance between the two (l2 norm -- sum of squares of differences, then take square root) / divide by euclidean distance of each of them added together to get a ratio
