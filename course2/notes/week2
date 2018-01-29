@@ -1,8 +1,37 @@
 Mini-Batch Gradient Descent
 . split your training examples into smaller batches and perform gradient descent after forward prop on each batch
+. when plotting cost against # of iterations:
+ -- batch GD: graph should be smooth curve
+ -- mini-batch GD: graph will oscillate, b/c of error in individual mini-batches, but should trend downward
+. Mini-batch size:
+  -- can range from m, your entire training set -- this obviously takes a long time
+  -- to 1, single training example (aka stochastic GD) -- you lose all benefits of vectorization by doing this
+  -- typical mini-batch sizes, powers of 2 ranging from 64 - 1024
+  -- make sure batches fit in cpu/gpu memory
 
 Notation Review
 . x^(i) -- i'th training example
 . z^[l] -- l'th layer of neural network
 . X^{t} -- t'th mini-batch
 . "epoch" -- one pass through entire training set; so, with mini-batch gd you're running gradient descent t times for a single epoch, where t is number of mini-batches
+
+Exponential weighted moving averages
+. e.g., for temperatures t, formula for weighted average:
+  V_t = B*V_t-1 + (1-B)Theta_t
+-- Theta_t is current temperature
+-- Beta, hyperparamter that represents weight being applied to previous values, so B = .9 weights previous average by .9 and
+   current reading by .1 ~ taking average of last 10 days of readings
+-- epsilon =  1-B, the weight you're applying to the current reading
+   1/(1-epsilon) gives you the approximate number of past readings you're weighting, so for .1, 1/(.1) = 10, so 10 previous readings
+   1/.02 = 50, so about 50 previous readings
+. Implementation:
+  V_theta := 0
+  repeat:
+    V_theta := BV_theta + (1-B)Theta_t
+ -- this is not completely accurate, but very memory efficient and close enough
+. Bias correction of weight averages:
+ -- setting your initial value of theta to 0 will bias readings toward 0
+ -- optional: only if you can't tolerate inaccurate weights for first iterations of GD
+ -- to correct:
+   -- V_t = V_t / (1 - B^t)
+   -- this will increase values of V_t for your initial averages, then the denominator will approach zero and become insignificant
