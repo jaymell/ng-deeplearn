@@ -35,3 +35,87 @@ Exponential weighted moving averages
  -- to correct:
    -- V_t = V_t / (1 - B^t)
    -- this will increase values of V_t for your initial averages, then the denominator will approach zero and become insignificant
+
+Other Optimization Algorithms
+
+GD with Momentum
+. works for batch or mini-batch
+. basically, applying weighted averaging to your derivatives
+. For each batch/mini-batch:
+  Vdw = BVdW + (1-B)dW
+  Vdb = Bvdb + (1-B)db
+  then update parameters:
+  W = W - alpha * Vdw
+  b = b - alpha * Vdb
+. this has the effect of cancelling out oscillations in GD -- because the pos/neg variations in undesired axis will cancel out,
+  whereas the negative slop toward the minimum will continue to be expressed
+. hyperparm B -- 0.9 is a good default value
+  -- you can also add bias correction (ie, Vdw/(1-B^t), but in practice not needed b/c bias goes away after only ~ 10 iterations
+
+RMSprop (root mean square...)
+. Conceptually similar to momentum
+. basically, you average out fluctuations in gradient descent by first element-wise squaring the derivatives;
+  when you update parameters, you divide by square root of the squared term, which will more greatly reduce the
+  size of larger derivatives; this should have the effect of minimizing oscillation; the axis with more oscillation
+  will have larger squared terms, thus the oscillating parameters will be updated more slowly when divided by the square root
+. For each batch/mini-batch:
+  Sdw = B_2Sdw + (1-B_2)dW^2
+  Sdb = B_2Sdb + (1-B_2)db^2
+  then update parameters:
+  W := W - alpha * (dW/(sqrt(Sdw) + e))
+  b := b - alpha * (db/(sqrt(Sdb) + e))
+  -- e is just a small term to prevent close-to-zero values in denominator, say, 10e-8
+  -- both of these using element-wise squaring
+  -- S instead of V, B_2 instead of B just to distinguish from terms in momentum; they're largely serving the same purpose
+
+
+Adam -- Adaptive Moment Estimation
+. combine momentum and RMSprop
+. For each batch/mini-batch:
+
+  Vdw = B_1VdW + (1-B_1)dW
+  Vdb = B_1vdb + (1-B_1)db
+
+  Sdw = B_2Sdw + (1-B_2)dW^2
+  Sdb = B_2Sdb + (1-B_2)db^2
+
+  Now correct them, basically adding in bias correction term:
+
+  Vdw_corrected = Vdw/(1-B_1^t)
+  Vdb_corrected = Vdb/(1-B_1^t)
+  Sdw_corrected = Sdw/(1-B_2^t)
+  Sdb_corrected = Sdb/(1-B_2^t)
+
+  Then update parameters:
+
+  W := W - alpha * (VdW_corrected/(sqrt(Sdw_corrected) + e)
+  b := b - alpha * (Vdb_corrected/(sqrt(Sdb_corrected) + e)
+
+. Hyperparameters
+ -- alpha -- most important, will need to be tuned
+ -- B_1 -- 0.9 -- what paper authors recommend, can be tuned but less important
+ -- B_2 -- 0.999 -- what paper authors recommend, can be tuned but less important
+ -- e -- 10e-8
+
+
+Learning Rate Decay
+. reduce learning rate over time, take smaller steps as approaching minimum
+. e.g., alpha = (1/( 1 + decay rate * epoch number)) * alpha_0
+  -- alpha_0 is initial alpha value
+  -- decay rate is tuneable param, e.g., 1
+. tune both alpha and decay rate
+. other possible formulas:
+ -- alpha = .95^epoch num * alpha_0
+ -- alpha = (k / sqrt(epoch num)) * alpha_0
+ -- manual decay, tuning by hand while babysitting a model
+. in general, learning rate decay less important in hyperparameter tuning
+
+
+Local Optima
+. generally believed at this point that local optima less
+  of a problem than previously thought
+. instead, "saddle points"
+. "plateaus" are bigger problem -- ie, large areas where slope is nearly zero
+. bottom line, seems that low-dimensional analogies don't hold
+  in many-dimensional problems, but we still don't really understand
+  high-dimensionality
