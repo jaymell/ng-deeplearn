@@ -1,0 +1,45 @@
+Hyperparameter Tuning
+. alpha, learning rate, generally most important
+. followed by:
+ -- beta for momentum
+ -- number hidden units
+ -- mini-batch size
+. followed by:
+ -- number of layers
+ -- learning rate decay
+. almost never:
+ -- beta_1 (0.9), beta_2 (0.999), epsilon (10e-8) in Adam
+
+Random sampling
+. formerly, 'grids' were common approach, but this would artificially
+  limit number of observations on each tested hyperparam
+. Course to fine -- drill in to progressively narrower ranges of values,
+  continue random sampling within these narrower ranges
+. appropriate scale
+ -- random doesn't necessarily mean 'uniformly' at random
+ -- if the scale of a particular parameter is logarithmic, you should
+    sample uniformly on a logarithmic scale
+    if expected range is 0.0001 to 1, don't uniformly sample between those;
+    rather, sample evenly between 0.0001 and 0.001, 0.001 and 0.01, 0.01 and .1, .1 and 1
+ -- in python:
+   r = -4 * np.random.rand()
+   var = 10**r
+
+
+"Pandas" vs Caviar
+. babysitting one model, testing various hyperparameters, vs
+  testing lots of different models in parallel
+. depends on available computing resources which approach is more feasible, but testing lots of models at once always preferable
+
+
+Batch Normalization
+. Normalizing the inputs (ie, z or a, usually z) of each layer of your network
+. For layer l, feature i, compute mean, variance of z^[l]i, standard deviation
+  -- mu = 1/m * Sigma(z^[l]i)
+  -- sigma^2 = 1/m * Sigma(z^[l]i - mu)^2
+  -- z_norm = z^[l]i - mu / sqrt( sigma^2 + e)
+    -- e is added to avoid possible zero values in denominator
+. You may not want mean of zero and variance of 1, though, so you use other learnable parameters, gamma and beta, to control this
+ -- ztilde^[l]i = gamma * z_norm + beta
+ -- gamma and beta are updated along w/ othe parameters as model is trained
+
