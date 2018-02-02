@@ -39,7 +39,24 @@ Batch Normalization
   -- sigma^2 = 1/m * Sigma(z^[l]i - mu)^2
   -- z_norm = z^[l]i - mu / sqrt( sigma^2 + e)
     -- e is added to avoid possible zero values in denominator
-. You may not want mean of zero and variance of 1, though, so you use other learnable parameters, gamma and beta, to control this
+. You may not want mean of zero and variance of 1, though, so you use other learnable parameters, gamma and Beta, to control this
  -- ztilde^[l]i = gamma * z_norm + beta
- -- gamma and beta are updated along w/ othe parameters as model is trained
+ -- gamma and Beta are updated along w/ othe parameters as model is trained
+. when using normalization, you don't need the bias term, as it's effectively
+  eliminated anyway during mean subtraction; "Beta" plays this role
+  -- so, to calculate z:
+    z^[l] = W^[l]a^[l-1]
+    calculate z_norm^[l]
+    ztilde^[l] = gamma^[l] * z_norm^[l] + Beta^[l]
+. dimensions of gamma and Beta are both (n^[l], l)
+. normalization useful in part b/c it makes weights in later layers of the network
+  robust to changes in earlier layers -- ie, dramatically different input values
+  won't affect weights as much
+. regularization effect:
+  -- because mean and variance are computed on a given _mini batch_, you will get some
+     noise in the activations that is somewhat like dropout
+  -- nonetheless, you shouldn't use batch norm purely for the regularization effect
+. using during testing
+ -- basically, you need to maintain a running weighted average for mu and sigma^2
+    that you can use during testing
 
