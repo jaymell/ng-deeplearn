@@ -60,3 +60,15 @@ Batch Normalization
  -- basically, you need to maintain a running weighted average for mu and sigma^2
     that you can use during testing
 
+Softmax Regression
+. multi-class classification
+. uses softmax activation function in last layer:
+  Z^[L] as usual: Z^[L] = w^[L]a^[L-1] + b^[L]
+  then calculate temporary variable t:
+  t = e^(Z^[L])
+  a^[L] = t / Sigma(t) <-- this returns nX1 matrix of normalized values -- probabilities of each class
+     n == C = the number of classes in output layer
+. Loss function
+  L(yhat, y) = -Sigma_j(y_j * log(yhat_j))
+    -- this will always be zero, except for the 1 class where y_j == 1 (y will always be matrix like [[0,0,0,1]] )
+    -- so, goal is to make yhat_j big for correct class
