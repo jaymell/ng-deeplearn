@@ -1,0 +1,54 @@
+ML Strategy
+. how to efficiently develop and iterate on solutions to problems
+
+Orthogonalization
+. able to independently tune various hyperparameters depending on
+  problem trying to solve:
+1) Fit training set well on cost function
+  -- bigger network
+  -- different optimization algorithm
+2) Fit dev set well on cost function
+  -- regularization
+  -- bigger training set
+3) Fit test set well on cost function
+  -- bigger dev set
+4) Perform well in real world
+  -- change dev set
+    -- something wrong with dev set distribution
+  or cost function
+    -- not measuring the right thing
+. why "early stopping" not ideal -- it couples fist two goals and is thus
+  not orthogonal
+
+
+Single evaluation metric
+. Precision:
+  -- accuracy of a model's classifications -- ie, of examples recognized as cats, percentage
+     that actually are cats -- i.e., considers false positives
+. Recall:
+  -- percentage of actual cats that are correctly recognized -- i.e., this accounts for false negatives
+. Traditionally there is a tradeoff between these two
+ -- if two models you're comparing having different levels of performance on precision vs recall,
+    how do you determine which model is better?
+. Instead, have a single metric that combines both
+. F1 score
+  -- "average" of P and R
+  -- Formula:
+  2 / ( (1/P) + (1/R) )  -- "Harmonic mean"
+. Simple averages can also work in certain cases
+
+. Satisficing vs Optimizing metrics
+ -- satisficing -- model just has to perform better than some threshold level, ie finish in < 80 ms
+ -- optimizing -- picking model with best performance on particular metric
+
+Dev/Test Sets
+. Dev, aka hold-out cross-validation set
+. changing dev/test set metrics:
+ -- example given is 2 algorithms, one with smaller error and thus preferred by your metrics,
+    but with chance of returning porn along with cat images -- so, bad algorithm
+ -- *** evaluation metrics to rank models needs to change
+. don't allow yourself to go for too long without evaluatio metrics and dev set, more
+  important to choose something imperfect and iterate than to spend time building
+  something and not getting feedback
+
+
