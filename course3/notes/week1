@@ -47,8 +47,42 @@ Dev/Test Sets
  -- example given is 2 algorithms, one with smaller error and thus preferred by your metrics,
     but with chance of returning porn along with cat images -- so, bad algorithm
  -- *** evaluation metrics to rank models needs to change
-. don't allow yourself to go for too long without evaluatio metrics and dev set, more
+. don't allow yourself to go for too long without evaluation metrics and dev set, more
   important to choose something imperfect and iterate than to spend time building
   something and not getting feedback
 
+Human-level Performance
+. human performance is good metric to compare against b/c it provides a known target you can use to
+  determine bias/variance problems -- once you surpass it, you have fewer means to assess performance
+. Bayes' optimal error -- theoretical limit for model's accuracy
+ -- doing better than this is by definition overfitting
+. Human-level error can serve as a proxy for Bayes' optimal error
 
+Comparing:
+  Human error
+  to
+  Training Error
+  to
+  Dev Error
+
+Assessing the relative difference between these can help you determine what you need to focus on
+to improve performance. If:
+
+__Error__
+Human: 1%
+Training: 8%
+Dev: 10%
+
+the relative gap between Human and Training suggests a bias problem -- you need to improve performance on
+your training set
+
+But if instead:
+__Error__
+Human: 7.5%
+Training: 8%
+Dev: 10%
+
+then the larger relative difference between training/dev suggests a variance issue
+
+Avoidable Bias
+. the relative gap between human error / Bayes' error and your model
