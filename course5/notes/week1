@@ -1,0 +1,119 @@
+RNNs
+
+example: Named Entity Recognition
+given a sentence: "Harry Potter and Hermione Granger invented a new spell"
+give a y indicating whether each word is part of a name: 1 1 0 1 1 0 0 0 0
+
+notation:
+  "Harry Potter and Hermione Granger invented a new spell"
+  x^<1>  x^<2>  x^<3>   ...          x^<t>   ...    x^<9>
+  Tx = 9
+
+  1   1   0   1   1   0   0   0   0
+  y^<1>    ....       y^<t>  ...  y^<9>
+  Ty = 9
+
+NLP
+. come up with a 'vocabulary' or 'dictionary'
+  -- list of all possible words -- number each word in dictionary
+  -- modern dictionaries often >1 million words
+. one-hot representation --- ie vector of 9999 zeroes and one 1 for a particular
+  word in a 10,000 word dictionary
+
+Why not use a Standard NN?
+. inputs, outputs can be different lengths, ie from sentence to sentence
+  -- you could potentially zero-pad shorter sentences
+. But, still wouldn't learn from commonalities appearing in different parts of sentence
+  -- ie, 'Harry' appearing as first word wouldn't generalize to Harry appearing later
+
+
+Basic structure
+. with each loop or time-step of RNN, your input is both x and a
+ -- x is whatever value of x is for particular iteration
+ -- a is an activation based on previous iterations; a_0, along with x^<1> is first
+    input to RNN, a_0 usually just a zero-vector
+ -- W_ax are weights applied at each time-step of the network
+ -- W_aa are weights applied to the a matrices at each time-step of network
+ -- W_ya are weights applied to y at each time-step
+ -- the double sub-scripts indicate that, for example for W_ax, it is being used
+    to compute an a-like and x-like quantity ...expl?
+. RNNs can be either unidirectional or bidirectional
+ -- with unidirectional, only weights or prior values contribute to subsequent input values
+ -- with bidirectional, later values of x can also contribute at a given time-step
+   -- e.g., imagine using later words of a sentence as weighted input for an earlier word
+
+. calculations:
+ -- at time-step 0:
+   a^<0> = 0
+ -- at time-step 1:
+   a^<1> = g(W_aa*a^<0> + W_ax*X^<1> + b_a) -- g is often either tanh or relu
+   yhat^<1> = g(W_ya*a^<1> + b_y) -- y is generally calculated using sigmoid or softmax for multi-class
+ -- at time-step t:
+   a^<t> = g(w_aa * a^<t-1> + W_ax*X^<t> + b_a)
+   yhat^<t> = g(W_ya*a^<t> + b_y)
+
+. forward prop:
+  -- basic idea is that a^<0> and x^<1> are used to calculate y^<1> and a^<1>
+  -- a^<1> and x^<2> are used to calculate y^<2> and a^<2>
+  -- a^<t-1> and x<t> calculate y^<t> and a<t>
+
+simplifying the parameters a bit to make dealing with deep networks easier:
+. from this:
+   a^<t> = g(w_aa * a^<t-1> + W_ax*x^<t> + b_a)
+
+  to this:
+
+  a^<t> = g(w_a[ a^<t-1>,x^<t> ] + b_a )
+
+  collapse w_aa and w_ax into a single matrix:
+
+  [ w_aa ; w_ax ] = W_a
+
+  ie, if w_aa is 100x100 matrix and w_ax is 100x10000, Wa is 100x10100 dimensional
+
+
+  colapse a^<t-1> and x^<t> into a single vector;, so if a^<t-1> is 100x1 and x^<t> is 10000x1:
+
+  [ a^<t-1>,x^<t> ] is 10100x1 vector
+
+
+  if you multiply these collapsed matrices, you will get back the original values:
+
+  [ w_aa ; w_ax ] x [ a^<t-1>,x^<t> ]  = w_aa * a^<t-1> + W_ax*x^<t>
+
+
+  this doesn't change much:
+
+  yhat^<t> = g(W_ya*a^<t> + b_y)
+
+  just simplify the subscript:
+
+  yhat^<t> = g(W_y*a^<t> + b_y)
+
+
+RNN Backpropagation
+. L(yhat, y) = Sigma_1..Tx( L^<t>(yhat^<t>, y^<t> ))
+. calculations of individual losses look like logistic regression:
+  L^<t>(yhat^<t>, y^<t> ) = -y^<t> * log(yhat^<t>) - (1 - y^<t>) * log(1-yhat^<t>)
+
+
+Various RNN architectures
+. many-to-many
+ -- ie input is a sequence of words and output is a sequence of words
+ -- output dimensions don't have to much, though; imagine translating between 2 languages
+   -- so multiple recursions of input sequence ("encoder") followed by multiple recursions
+      of output feeding more output ("decoder")
+
+. many-to-one
+ -- ie input is a series of words
+ -- output can be a single number in 0-5 scale, ie for sentiment classification
+ -- in this case, the network itself recurses many times before outputting a single value
+
+. one-to-one
+ -- more like a standard NN
+
+. one-to-many
+ -- music generation
+ -- single input corresponding to output of multiple notes
+ -- in reality, input would just be output of previous layer, without separate x inputs *** (a?)
+
