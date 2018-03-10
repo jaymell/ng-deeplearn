@@ -117,3 +117,107 @@ Various RNN architectures
  -- single input corresponding to output of multiple notes
  -- in reality, input would just be output of previous layer, without separate x inputs *** (a?)
 
+
+Language / Sequence Modeling
+. first tokenize sentences, ie one-hot encode words based on vocabulary; possible
+  tokens for EOS (end of sentence) and unknown words
+
+. structure of RNN, given a sentence input:
+ -- goal is basically to predict next words, given initial 0 input followed by actual
+    words of sentence
+
+"This random sentence"
+
+t1:
+a^<0> = 0
+x^<1> = 0
+... y^<1> = P(any word in dictionary being first word) -- softmax
+
+t2:
+a^<1> = ...
+x^<2> = y^<1> (whatever the first word _actually_ is), in this case, "This"
+y^<2> = P(2nd word | "This")
+
+and so on....
+
+key point is that x input is always, with exception of first iteration, the _actual_ values
+of y
+
+. Loss
+ L(yhat^<t>, y^<t>) = -Sigma(y_i^<t> * log(yhat_i^<t>) )
+
+. Overall Los
+ Sigma( L^<t>(yhat^<t>, y^<t>) )
+
+
+Generating Novel Sequences
+. Given a vocabulary, provide t1 input as above (0's initially); yhat^<1> output a vector, make
+a random choice from that (e.g., np.random.choice), use that as input for x^<2>, and so on
+. You can also do this with character level sequence instead of words
+ -- e.g., vocabulary of alphabet, special characters, digits, etc.
+ -- pro: won't have to worry about unknown words, since can assign probability to any sequence of characters
+ -- models more computationally expensive and not as good at capturing long-range dependencies
+
+
+Vanishing Gradients
+. Imagine a sentence with long-range dependencies.... e.g.,
+
+The _dogs_, which were ...., _were_
+The _dog_, which was ...., _was_
+
+Problem is similar to deep neural networks, which is that it's difficult for backpropagation beginning at later t-values (layers) to affect earlier t-values (layers)
+
+. exploding gradients is also possible, and catastrophic for model, but can be fixed via 'gradient clipping'
+
+
+Gated Recurrent Unit
+. is actually more recent (and less complicated) than LSTM
+. memory cell
+. stores memory about particular t's of network
+. potentially updated at each t
+
+c^<t> = a^<t> -- think of c as 'candidate' -- ie, it _may_ be used to update
+each iteration:
+ctilde^<t> = tanh(W_c[c^<t-1>, x^<t>] + b_c)
+
+Update Gate -- between 0 and 1 -- think of it as being 0 or 1, though can be between:
+  Gamma_u = sigmoid(W_u[c^<t-1>, x^<t>] + b_u) -- u means 'update'
+
+Value of gate determines whether we update c with ctilde:
+
+c^<t> = Gamma_u * ctilde^<t> + (1-Gamma_u) * c^<t-1>
+
+if Gamma_u is 0, c^<t> = c^<t-1>
+if Gamma_u is 1, c^<t> = ctilde^<t>
+
+
+c^<t> can be a vector, in which case Gamma and ctilde are same dimension
+if vector, multiplication in updating c<t< is _element-wise_, so some 'bits' in the
+vector change, others don't
+
+
+Actually, above is oversimplifcation. There is actually an additional Gamma_r involved
+ -- think of the r as being 'relevance'
+
+ ctilde^<t> = tanh(W_c[Gamma_r, c^<t-1>, x^<t>] + b_c)
+ Gamma_u = sigmoid(W_u[c^<t-1>, x^<t>] + b_u)
+ Gamma_r = sigmoid(W_r[c^<t-1>, x^<t>] + b_r)
+ c^<t> = Gamma_u * ctilde^<t> + (1-Gamma_u) * c^<t-1>
+
+
+ Alternate notation:
+ htilde for ctilde^<t>
+ u for Gamma_u
+ r for Gamma_r
+ h for c^<t>
+
+
+LSTM -- Long Short-Term Memory Unit
+
+ctilde^<t> = tanh(W_c[a^<t-1>, x^<t>] + b_c) -- a^<t-1> instead of c^<t-1>
+Gamma_u = sigmoid(W_u[a^<t-1>, x^<t>] + b_u)
+Gamma_f = sigmoid(W_f[a^<t-1>, x^<t>] + b_f) -- 'forget' gate
+Gamma_o = sigmoid(W_o[a^<t-1>, x^<t>] + b_o) -- 'output' gate
+c^<t> = Gamma_u * ctilde^<t> + Gamma_f*c^<t-1> -- element-wise multiplication
+a^<t> = Gamma_o*c^<t>
+
