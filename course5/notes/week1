@@ -33,8 +33,15 @@ Basic structure
  -- a is an activation based on previous iterations; a_0, along with x^<1> is first
     input to RNN, a_0 usually just a zero-vector
  -- W_ax are weights applied at each time-step of the network
+  -- shape: (n_a, n_x)
  -- W_aa are weights applied to the a matrices at each time-step of network
+   -- shape: (n_a, n_a)
  -- W_ya are weights applied to y at each time-step
+   -- shape: (n_y, n_a)
+ -- b_a
+   -- shape: (n_a, 1)
+ -- b_y
+   -- shape: (n_y, 1)
  -- the double sub-scripts indicate that, for example for W_ax, it is being used
     to compute an a-like and x-like quantity ...expl?
 . RNNs can be either unidirectional or bidirectional
